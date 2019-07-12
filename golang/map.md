@@ -36,13 +36,11 @@ const (
 	bucketCnt     = 1 << bucketCntBits
 
 	// loadFactorNum/loadFactDen 表示装载因子，超过这个就需要扩容
-	// todo: 怎么和Bucket数量关联
+	// loadFactorNum * (2^B) / loadFactDen 大于这个值就是超过负载
 	loadFactorNum = 13
 	loadFactorDen = 2
 
-	// Maximum key or value size to keep inline (instead of mallocing per element).
-	// Must fit in a uint8.
-	// todo: 什么是inline
+	// 这个大小以下的k & v是可以inline
 	maxKeySize   = 128
 	maxValueSize = 128
 
@@ -67,7 +65,7 @@ const (
 	sameSizeGrow = 8 // 同等大小扩容(没有超过负载因子，但是overflow的buckets太多，碎片太多)
 
 	// sentinel bucket ID for iterator checks
-	noCheck = 1<<(8*sys.PtrSize) - 1	// 用于标志不需要进行检查 todo: 翻译不合适
+	noCheck = 1<<(8*sys.PtrSize) - 1	// 用于标志不需要进行检查
 )
 ```
 
@@ -77,14 +75,14 @@ type hmap struct {
 	count     int // map的元素个数
 	flags     uint8	// 状态标志位
 	B         uint8  // bucket数量的log_2 (最多可以保存 装载因子 * 2^B 元素)
-	noverflow uint16 // overflow的bucket数量，量级小的时候精确，大的时候是近似值 todo: incrnoverflow
+	noverflow uint16 // overflow的bucket数量，量级小的时候精确，大的时候是近似值
 	hash0     uint32 // hash种子
 
 	buckets    unsafe.Pointer // hash桶的起始指针
 	oldbuckets unsafe.Pointer // 扩容的时候才不为空，老的hash桶指针 是否为空作为判断是否扩容的依据
 	nevacuate  uintptr        // 小于这个索引前的bucket都已经迁移完成
 
-	extra *mapextra // todo: 没有理解这个变量的意义
+	extra *mapextra // 为了避免被gc,需要单独hold溢出桶的指针
 }
 ```
 
@@ -198,7 +196,25 @@ func (h *hmap) newoverflow(t *maptype, b *bmap) *bmap {
 		ovf = (*bmap)(newobject(t.bucket))
 	}
 	h.incrnoverflow()
-	// todo: kinNoPointers啥意义？128又是啥意义？
+	// 是非指针类型
+	// 因为map的type被标志为kindNoPointers
+	// 所以为了避免overflow被gc，需要单独hold这些指针
+	/*
+		In that code t is *maptype, which is to say it is a pointer to the 
+		type descriptor for the map, essentially the same value you would get 
+		from calling reflect.TypeOf on the map value.  t.bucket is a pointer 
+		to the type descriptor for the type of the buckets that the map uses. 
+		This type is created by the compiler based on the key and value types 
+		of the map.  If the kindNoPointers bit is set in t.bucket.kind, then 
+		the bucket type does not contain any pointers.  With the current 
+		implementation, this will be true if the key and value types do not 
+		themselves contain any pointers and both types are less than 128 
+		bytes.  Whether the bucket type contains any pointers is interesting 
+		because the garbage collector never has to look at buckets that 
+		contain no pointers.  The current map implementation goes to some 
+		effort to preserve that property.  See the comment in the mapextra 
+		type.
+	*/
 	if t.bucket.kind&kindNoPointers != 0 {
 		h.createOverflow()
 		*h.extra.overflow = append(*h.extra.overflow, ovf)
@@ -271,7 +287,7 @@ func makeBucketArray(t *maptype, b uint8, dirtyalloc unsafe.Pointer) (buckets un
 	}
 
 	// 这里针对已有的分配进行内存清理工作
-	// todo: 细节还不太理解
+	// todo: 内存清理的细节还不太理解
 	if dirtyalloc == nil {
 		buckets = newarray(t.bucket, int(nbuckets))
 	} else {
@@ -503,6 +519,12 @@ func hashGrow(t *maptype, h *hmap) {
 	newbuckets, nextOverflow := makeBucketArray(t, h.B+bigger, nil)
 
 	// todo: 迭代器标志位的处理不太理解
+	// &^ 按位置 0运算符 
+	// x = 01010011
+	// y = 01010100
+	// z = x &^ y = 00000011
+	// 如果ybit位为1，那么结果z对应bit位就为0，否则z对应bit位就和x对应bit位的值相同
+	// 先把 h.flags 中 iterator 和 oldIterator 对应位清 0，然后如果发现 iterator 位为 1，那就把它转接到 oldIterator 位，使得 oldIterator 标志位变成 1。潜台词就是：buckets 现在挂到了 oldBuckets 名下了，对应的标志位也转接过去吧
 	flags := h.flags &^ (iterator | oldIterator)
 	if h.flags&iterator != 0 {
 		flags |= oldIterator
@@ -567,12 +589,10 @@ func advanceEvacuationMark(h *hmap, t *maptype, newbit uintptr) {
 	if h.nevacuate == newbit { // 已迁移数量等于老的buckets数量
 		// 迁移完成
 		h.oldbuckets = nil
-		// todo: extra.oldoverflow是干嘛的？
 		// [1] 表示 old overflow bucket
 		if h.extra != nil {
 			h.extra.oldoverflow = nil
 		}
-		// todo: &^= 操作符作用
 		// 清除正在扩容的标志位
 		h.flags &^= sameSizeGrow
 	}
