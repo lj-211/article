@@ -1,9 +1,11 @@
 # article
 个人技术文章
 
+Part.01 GO语言相关技术文章
+
 ## 目录
 
-> - [Part.01.A.Learning-is-a-Marathon（**golang的hashmap实现**）](./golang/map.md)
+> - [Part.01.Golang-Hashmap（**golang的hashmap实现**）](./golang/map.md)
 
 ## 备注
 ### 版权说明
