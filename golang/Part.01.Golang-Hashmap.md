@@ -518,7 +518,6 @@ func hashGrow(t *maptype, h *hmap) {
 	oldbuckets := h.buckets
 	newbuckets, nextOverflow := makeBucketArray(t, h.B+bigger, nil)
 
-	// todo: 迭代器标志位的处理不太理解
 	// &^ 按位置 0运算符 
 	// x = 01010011
 	// y = 01010100
