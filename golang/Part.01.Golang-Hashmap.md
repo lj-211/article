@@ -809,7 +809,12 @@ next:
 			}
 			it.value = v
 		} else {
-			// todo: 这里不太理解，为什么要重新查找，不是以bucket为单位全部迁移完了
+            // NOTE: 这里要重新查找的原因是，有可能在range遍历的循环中删除元素
+			// 参照: https://golang.org/ref/spec#For_statements
+			// The iteration order over maps is not specified and is not guaranteed to be the same from one iteration to the next.
+			// If a map entry that has not yet been reached is removed during iteration, the corresponding iteration value will not be produced.
+			// If a map entry is created during iteration, that entry may be produced during the iteration or may be skipped.
+			// The choice may vary for each entry created and from one iteration to the next. If the map is nil, the number of iterations is 0.
 			rk, rv := mapaccessK(t, h, k)
 			if rk == nil {
 				continue // key has been deleted
