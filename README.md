@@ -6,6 +6,7 @@
 > - [Part.01.Golang-Hashmap（**golang的hashmap实现**）](./golang/Part.01.Golang-Hashmap.md)
 > - [Part.01.Golang-Mutex-RWMutex（**golang的Mutext&RWMutex实现**）](./golang/Part.01.Golang-Mutex-RWMutex.md)
 > - [Part.01.Golang-sync-Map（**golang的并发安全Map实现**）](./golang/Part.01.Golang-sync-Map.md)
+> - [Part.01.Golang-Slice（**golang的Slice实现**）](./golang/Part.01.Golang-Slice.md)
 
 ## 备注
 ### 版权说明
