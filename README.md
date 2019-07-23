@@ -15,7 +15,7 @@ Go的基础数据结构以及语言本身的设计等等都会在这一系列里
 这一系列主要说说在Go在工程化的一些想法。
 
 > - [Part.02.A.Golang-handle-error（**golang的错误处理**）](./golang/Part.02.A.Golang-handle-error.md)
-> - [Part.02.B.Golang-testing（**golang的如何应用测试**）](./golang/Part.02.B.Golang-testing.md)
+> - [Part.02.B.Golang-testing（**golang如何在项目中应用测试**）](./golang/Part.02.B.Golang-testing.md)
 
 ### 思维
 
