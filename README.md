@@ -5,11 +5,11 @@
 ### Go源码
 Go的基础数据结构以及语言本身的设计等等都会在这一系列里面展开。
 
-> - [Part.01.A.Golang-Hashmap（**golang的hashmap实现**）](./golang/Part.01.Golang-Hashmap.md)
-> - [Part.01.B.Golang-Mutex-RWMutex（**golang的Mutext&RWMutex实现**）](./golang/Part.01.Golang-Mutex-RWMutex.md)
-> - [Part.01.C.Golang-sync-Map（**golang的并发安全Map实现**）](./golang/Part.01.Golang-sync-Map.md)
-> - [Part.01.D.Golang-Slice（**golang的Slice实现**）](./golang/Part.01.Golang-Slice.md)
-> - [Part.01.E.Golang-Channel（**golang的Channel实现**）](./golang/Part.01.Golang-Channel.md)
+> - [Part.01.A.Golang-Hashmap（**golang的hashmap实现**）](./golang/Part.01.A.Golang-Hashmap.md)
+> - [Part.01.B.Golang-Mutex-RWMutex（**golang的Mutext&RWMutex实现**）](./golang/Part.01.B.Golang-Mutex-RWMutex.md)
+> - [Part.01.C.Golang-sync-Map（**golang的并发安全Map实现**）](./golang/Part.01.C.Golang-sync-Map.md)
+> - [Part.01.D.Golang-Slice（**golang的Slice实现**）](./golang/Part.01.D.Golang-Slice.md)
+> - [Part.01.E.Golang-Channel（**golang的Channel实现**）](./golang/Part.01.E.Golang-Channel.md)
 
 ### Go工程化
 这一系列主要说说在Go在工程化的一些想法。
