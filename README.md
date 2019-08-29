@@ -17,6 +17,11 @@ Go的基础数据结构以及语言本身的设计等等都会在这一系列里
 > - [Part.02.A.Golang-handle-error（**golang的错误处理**）](./golang/Part.02.A.Golang-handle-error.md)
 > - [Part.02.B.Golang-testing（**golang如何在项目中应用单元测试**）](./golang/Part.02.B.Golang-testing.md)
 
+### 杂言
+包含了互联网的一些基础概念或者只要和互联网有关的知识。
+
+> - [Part.03.A.Misc-key-file-certificate-https-ssl-tls(**秘钥-证书-https-ssl&tls杂谈**)](./misc/)
+
 ### 思维
 
 ## 备注
