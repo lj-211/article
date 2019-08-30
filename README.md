@@ -20,7 +20,7 @@ Go的基础数据结构以及语言本身的设计等等都会在这一系列里
 ### 杂言
 包含了互联网的一些基础概念或者只要和互联网有关的知识。
 
-> - [Part.03.A.Misc-key-file-certificate-https-ssl-tls(**秘钥-证书-https-ssl&tls杂谈**)](./misc/)
+> - [Part.03.A.Misc-key-file-certificate-https-ssl-tls(**秘钥-证书-https-ssl&tls杂谈**)](./misc/Part.03.A.Misc-key-file-certificate-https-ssl-tls.md)
 
 ### 思维
 
