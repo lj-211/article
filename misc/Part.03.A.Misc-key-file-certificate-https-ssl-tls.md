@@ -93,9 +93,7 @@ AlgorithmIdentifier ::= SEQUENCE {
 ### 数字签名和数字证书
 数字签名和数字证书这两个概念比较模糊，我用一张图说明他们的关系。
 
-```
-// TODO 图示数字证书和数字签名
-```
+数字签名是指在使用加密算法对内容生成的digest信息，用于接收方校验内容是否被篡改。
 
 数字证书是指CA机构发行的一种电子文档，是一串能够表明网络用户身份信息的数字，提供了一种在计算机网络上验证网络用户身份的方式，因此数字证书又称为数字标识。
 
@@ -115,9 +113,7 @@ BASE64 ENCODED DATA
 ## https协议
 https协议就是数字证书应用的一个典型案例。
 
-### https怎么验证CA证书
-TODO GO源码 & 浏览器 & OCSP stapling
-
+### go https中的根证书
 GO的实现中证书的设定位于tls.Config.RootCAs，我们来看下注释
 
 > RootCAs defines the set of root certificate authorities
@@ -140,6 +136,14 @@ pool.AppendCertsFromPEM(pemData)
 RootCAs = pool
 ```
 
+### 浏览器https流程
+1. 浏览器请求URL地址建立tcp连接
+2. 完成ssl/tsl协议的四次握手过程
+	2.1 浏览器拿到服务器返回的证书，在浏览器内建的根证书中验证是否合法
+	2.2 检查服务器有没有返回证书有效性信息，没有进行在线认证
+	2.3 生成对称加密的key
+3. 开始进行http协议数据的加密传输
+
 ### SSL证书
 目前主流的SSL证书的种类有DV OV EV三种。他们的核心区别如下：
 - DV不包含组织信息	
@@ -156,14 +160,22 @@ SSL/TSL协议的设计目的:
 - 所有信息都是加密传播，第三方无法窃听。
 - 具有校验机制，一旦被篡改，通信双方会立刻发现。
 - 配备身份证书，防止身份被冒充。
-### 协议流程
-TODO
-### 一些特殊的点
-- 双向认证
-- go的tls实现
+
+
 ### 拆解go的tls实现
 go的tls实现在crypto/tls/handshake_client.go和crypto/tls/handshake_server.go
-#### tls client
+
+协议类型
+```
+// record协议中的四种类型
+const (
+	recordTypeChangeCipherSpec recordType = 20	// 切换协议从handshake到applicationdata
+	recordTypeAlert            recordType = 21	// 告警协议
+	recordTypeHandshake        recordType = 22	// 握手协议
+	recordTypeApplicationData  recordType = 23	// 对称加密交互application data
+)
+```
+#### handshake
 tls client存在会话缓存的概念，已存在server的会话如果有缓存连接，那不需要做全握手，只需要重新做一次握手就可以恢复会话;
 ```
 // 会话状态，保存用于恢复tls会话的数据
@@ -216,10 +228,12 @@ func (c *Conn) clientHandshake() (err error) {
 		return err
 	}
 
+	// 加载缓存会话
+	// 过程中会检查证书链、会话是否过期、加密组件以及pre_shared_key等
 	cacheKey, session, earlySecret, binderKey := c.loadSession(hello)
 	if cacheKey != "" && session != nil {
 		defer func() {
-			// 如果出现异常错误则删除缓存会话
+			// 如果出现异常错误则需要把这个会话丢弃
 			if err != nil {
 				c.config.ClientSessionCache.Put(cacheKey, nil)
 			}
@@ -261,7 +275,9 @@ func (c *Conn) clientHandshake() (err error) {
 func (hs *clientHandshakeState) handshake() error {
 	c := hs.c
 
-	// 处理server hello消息
+
+	// server hello消息处理
+	// 涉及选择加密套件、压缩方法、设置证书、证书链等逻辑，这里不展开描述
 	isResume, err := hs.processServerHello()
 	if err != nil {
 		return err
@@ -270,6 +286,12 @@ func (hs *clientHandshakeState) handshake() error {
 	// 根据是否是恢复会话判断是否需要走全握手流程
 	c.buffering = true
 	if isResume {
+		// 客户端使用要被恢复的session，发送一个ClientHello，把Session ID包含在其中。server在自己的session 
+		// cache中，查找客户端发来的Session ID，如果找到，sever把找到的session 
+		// 状态恢复到当前连接，然后发送一个ServerHello，在ServerHello中把Session 
+		// ID带回去。然后，client和server都必须ChangeCipherSpec消息，并紧跟着发送Finished消息。这几步完成后，client和server 
+		// 开始交换应用层数据（如下图所示）。如果server在session cache中没有找到Session ID，那server就生成一个新的session 
+		// ID在ServerHello里给客户端，并且client和server进行完整的握手。
 		// 恢复会话因为不需要做全握手流程，其他流程是一样的所以这里略去
 	} else {
 		// 握手会话流程
@@ -280,6 +302,8 @@ func (hs *clientHandshakeState) handshake() error {
 		if err := hs.establishKeys(); err != nil {
 			return err
 		}
+
+		// 发送finishedMsg到server
 		if err := hs.sendFinished(c.clientFinished[:]); err != nil {
 			return err
 		}
@@ -287,10 +311,11 @@ func (hs *clientHandshakeState) handshake() error {
 			return err
 		}
 		c.clientFinishedIsFirst = true
-		// 读取会话秘钥
+		// 读取session ticket
 		if err := hs.readSessionTicket(); err != nil {
 			return err
 		}
+		// 读取server发送的finishMsg消息
 		if err := hs.readFinished(c.serverFinished[:]); err != nil {
 			return err
 		}
@@ -363,7 +388,8 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 		}
 	}
 
-	// 获取服务端的秘钥交换信息
+	// 获取服务端的秘钥附加信息
+	// 注意有些加密算法才有这些信息，比如rsa
 	keyAgreement := hs.suite.ka(c.vers)
 
 	skx, ok := msg.(*serverKeyExchangeMsg)
@@ -381,7 +407,9 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 		}
 	}
 
-	// TODO 证书链请求
+	// certificateRequestMsg是服务器要求客户端提供证书认证，也就是tls双向认证
+	// 一般这种场景用于银行的客户认证，比如微信支付的API接口就需要双向认证
+	// 不错要注意的是，如果服务器发送了此消息，客户端必须响应，如果没有就发送空
 	var chainToSend *Certificate
 	var certRequested bool
 	certReq, ok := msg.(*certificateRequestMsg)
@@ -420,6 +448,7 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 		}
 	}
 
+	// 根据算法生成密钥附加信息，发送出去
 	preMasterSecret, ckx, err := keyAgreement.generateClientKeyExchange(c.config, hs.hello, c.peerCertificates[0])
 	if err != nil {
 		c.sendAlert(alertInternalError)
@@ -432,35 +461,11 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 		}
 	}
 
+	// 生成handshake的digest发送给server
 	if chainToSend != nil && len(chainToSend.Certificate) > 0 {
-		certVerify := &certificateVerifyMsg{
-			hasSignatureAlgorithm: c.vers >= VersionTLS12,
-		}
+		
+		......
 
-		key, ok := chainToSend.PrivateKey.(crypto.Signer)
-		if !ok {
-			c.sendAlert(alertInternalError)
-			return fmt.Errorf("tls: client certificate private key of type %T does not implement crypto.Signer", chainToSend.PrivateKey)
-		}
-
-		signatureAlgorithm, sigType, hashFunc, err := pickSignatureAlgorithm(key.Public(), certReq.supportedSignatureAlgorithms, supportedSignatureAlgorithmsTLS12, c.vers)
-		if err != nil {
-			c.sendAlert(alertInternalError)
-			return err
-		}
-		// SignatureAndHashAlgorithm was introduced in TLS 1.2.
-		if certVerify.hasSignatureAlgorithm {
-			certVerify.signatureAlgorithm = signatureAlgorithm
-		}
-		digest, err := hs.finishedHash.hashForClientCertificate(sigType, hashFunc, hs.masterSecret)
-		if err != nil {
-			c.sendAlert(alertInternalError)
-			return err
-		}
-		signOpts := crypto.SignerOpts(hashFunc)
-		if sigType == signatureRSAPSS {
-			signOpts = &rsa.PSSOptions{SaltLength: rsa.PSSSaltLengthEqualsHash, Hash: hashFunc}
-		}
 		certVerify.signature, err = key.Sign(c.config.rand(), digest, signOpts)
 		if err != nil {
 			c.sendAlert(alertInternalError)
@@ -473,44 +478,92 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 		}
 	}
 
-	hs.masterSecret = masterFromPreMasterSecret(c.vers, hs.suite, preMasterSecret, hs.hello.random, hs.serverHello.random)
-	if err := c.config.writeKeyLog(keyLogLabelTLS12, hs.hello.random, hs.masterSecret); err != nil {
-		c.sendAlert(alertInternalError)
-		return errors.New("tls: failed to write to key log: " + err.Error())
-	}
+	......
+	// 根据pre-master secret生成master secret
 
 	hs.finishedHash.discardHandshakeBuffer()
 
 	return nil
 }
-```
 
-#### tls server
-```
-RootCAS - FetchPEMRoots
+func (hs *clientHandshakeState) readFinished(out []byte) error {
+	c := hs.c
 
-cs, ok := msg.(*certificateStatusMsg)
-if ok {
-	// RFC4366 on Certificate Status Request:
-	// The server MAY return a "certificate_status" message.
-
-	if !hs.serverHello.ocspStapling {
-		// If a server returns a "CertificateStatus" message, then the
-		// server MUST have included an extension of type "status_request"
-		// with empty "extension_data" in the extended server hello.
-
-		c.sendAlert(alertUnexpectedMessage)
-		return errors.New("tls: received unexpected CertificateStatus message")
+	// 读取change cipher消息，开始application data交互
+	if err := c.readChangeCipherSpec(); err != nil {
+		return err
 	}
-	hs.finishedHash.Write(cs.marshal())
 
-	c.ocspResponse = cs.response
-
-	msg, err = c.readHandshake()
+	msg, err := c.readHandshake()
 	if err != nil {
 		return err
 	}
+	serverFinished, ok := msg.(*finishedMsg)
+	if !ok {
+		c.sendAlert(alertUnexpectedMessage)
+		return unexpectedMessageError(serverFinished, msg)
+	}
+
+	verify := hs.finishedHash.serverSum(hs.masterSecret)
+	if len(verify) != len(serverFinished.verifyData) ||
+		subtle.ConstantTimeCompare(verify, serverFinished.verifyData) != 1 {
+		c.sendAlert(alertHandshakeFailure)
+		return errors.New("tls: server's Finished message was incorrect")
+	}
+	hs.finishedHash.Write(serverFinished.marshal())
+	copy(out, verify)
+	return nil
 }
+```
+
+#### 图解
+```
++----------+                    +----------+
+|          |                    |          |
+|  Client  |                    |  Server  |
+|          |                    |          |
++----+-----+                    +----+-----+
+     |           ClientHello         |
+     +------------------------------>+
+     |                               |
+     |                               |
+     |           Ser^erHello         |
+     +<------------------------------+
+     |         CertificateMsg        |
+     +<------------------------------+
+     |      CertificateStatusMsg     |
+     +<------------------------------+
+     |      Ser^erKeyExchangeMsg     |
+     +<------------------------------+
+     |      CertificateRequestMsg    |
+     +<------------------------------+
+     |          HelloDoneMsg         |
+     +<------------------------------+
+     |                               |
+     |                               |
+     |         CertificateMsg        |
+     +------------------------------>+
+     |       SlientKeyExchangeMsg    |
+     +------------------------------>+
+     |       CertificateVerifyMsg    |
+     +------------------------------>+
+     |        ChangeCipherSpec       |
+     +------------------------------>+
+     |           finishMsg           |
+     +------------------------------>+
+     |                               |
+     |                               |
+     |        SessionTicketMsg       |
+     +<------------------------------+
+     |         change cipher         |
+     +<------------------------------+
+     |           finishMsg           |
+     +<------------------------------+
+     |                               |
+     |                               |
+     |                               |
+     +                               +
+
 ```
 
 ## reference
