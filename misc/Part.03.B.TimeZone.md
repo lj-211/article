@@ -35,4 +35,5 @@ UTC时间常见的表达方式: “09:30 UTC”就写作“09:30Z”或是“093
 
 > parseTime = true 指的是自动将datetime、timestamp字段转换为time.Time类型
 >   如果没有设置可能会出现类似的转换错误: "unsupported Scan, storing driver.Value type []uint8 into type *time.Time
+
 > loc=Local 指的是使用当前会话使用本地时区，这样在做查询或者写入时，才能保证时区转化正常
