@@ -22,6 +22,7 @@ Go的基础数据结构以及语言本身的设计等等都会在这一系列里
 
 > - [Part.03.A.Misc-key_file_certificate_https_ssl_tls(**秘钥-证书-https-ssl&tls杂谈**)](./misc/Part.03.A.Misc-key_file_certificate_https_ssl_tls.md)
 > - [Part.03.B.Misc-timezone(**时区的概念**)](./misc/Part.03.B.Misc-timezone.md)
+> - [Part.03.C.Misc-how_to_review_or_create_large_pull_request(**Large Pull Request**)](./misc/Part.03.C.Misc-how_to_review_or_create_large_pull_request.md)
 
 ### 思维
 
