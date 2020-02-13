@@ -133,6 +133,7 @@ A---B---C---D  master
            | E---F---G  topicA
            |/
 A---B---C---D  master
+```
 
 ## cherry-pick
 关于cherry-pick，阅读下man文档的解释足矣；
@@ -146,12 +147,16 @@ A---B---C---D  master
 > git cherry-pick --quit
 > git cherry-pick --abort
 
-关于如何阅读SYNOPSIS可以参照[Part.03.E.Misc-how_to_read_synopsis_of_man(**如何阅读man文档的SYNOPSIS**)](./misc/Part.03.E.Misc-how_to_read_synopsis_of_man.md)
+关于如何阅读SYNOPSIS可以参照[Part.03.E.Misc-how_to_read_synopsis_of_man(**如何阅读man文档的SYNOPSIS**)](./Part.03.E.Misc-how_to_read_synopsis_of_man.md)
 
 > 这里需要特殊说明的是<commit>... 存在几种示例如下:
+
 > git cherry-pick master 应用master分支最顶端的commit
+
 > git cherry-pick ..master, git cherry-pick ^HEAD master 应用所有是master祖先而非HEAD祖先的commit
+
 > git cherry-pick maint next ^master, git cherry-pick maint master..next应用maint和next的所有祖先的commit而非master或者其祖先的commit
+
 > git cherry-pick master~4 master~2 应用head^4和head^2两个commit
 
 ## diff & patch
@@ -165,10 +170,13 @@ patch使用git format-patch生成 不仅记录文件差异，还记录了commit�
 
 ### 如何使用
 git diff 生成patch文件
+
 git apply --stat diff.patch 显示patch文件信息
+
 git apply --check diff.patch 检查patch文件
 
 git format-patch git.patch 生成patch文件
+
 git am git.patch 应用patch文件
 
 ### 使用场景
