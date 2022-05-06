@@ -1,7 +1,6 @@
 # 工具类中的数据结构之SRefSet
 
 ## 图解
-![avatar](https://guttural-hedgehog-61d.notion.site/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F3f9ef496-ad12-450d-b8bb-72a699d9031f%2FTDengine源码分析_-_utils_tref_-_1.png?table=block&id=d96bba6e-d52f-4f83-b517-6ebf40e637a9&spaceId=70e3249c-a548-4fcf-82aa-ca826c601db0&width=2000&userId=&cache=v2)
 <p align="center">
   <img width="821" height = "500" src="https://raw.githubusercontent.com/lj-211/article/master/res/asc-img/Part.04.A.TDengine-util_tref-P1%20-%20SRefSet.png" alt="SRefSet">
 </p>
