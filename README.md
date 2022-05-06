@@ -29,6 +29,7 @@ Go的基础数据结构以及语言本身的设计等等都会在这一系列里
 ### IoT
 #### TDengine
 > - [Part.04.A.TDengine-util_tref(**TDengine的工具数据结构之tref**)](./iot/Part.04.A.TDengine-util_tref.md)
+> - [Part.04.A.TDengine-util_hashtable(**TDengine的工具数据结构之hashtable**)](./iot/Part.04.A.TDengine-util_hashtable.md)
 > - [Part.04.A.TDengine-WAL_In_TDengine(**TDengine的WAL**)](./iot/Part.04.A.TDengine-WAL_In_TDengine.md)
 > - [Part.04.A.TDengine-why_TDengine_start_slow_when_too_many_ddl_accumulated(**当DDL积累过多时，为什么TDengine会启动变慢**)](./iot/Part.04.A.TDengine-why_TDengine_start_slow_when_too_many_ddl_accumulated.md)
 
