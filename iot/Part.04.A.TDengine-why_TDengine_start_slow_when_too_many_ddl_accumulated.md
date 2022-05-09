@@ -5,7 +5,7 @@
 
 ## mnode主要数据结构
 <p align="center">
-  <img width="1153" height = "800" src="https://github.com/lj-211/article/blob/master/res/asc-img/%5BPart.04.A.TDengine-why_TDengine_start_slow_when_too_many_ddl_accumulated%5D%20P1%20-%20Data%20Structure.png?raw=true" alt="data">
+  <img width="1008" height = "700" src="https://github.com/lj-211/article/blob/master/res/asc-img/%5BPart.04.A.TDengine-why_TDengine_start_slow_when_too_many_ddl_accumulated%5D%20P1%20-%20Data%20Structure.png?raw=true" alt="data">
 </p>
 <p align="center">P1 - mnode data struture</p>
 
