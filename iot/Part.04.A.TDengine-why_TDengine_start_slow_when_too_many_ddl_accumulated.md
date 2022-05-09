@@ -1,7 +1,9 @@
 # TDengine的mnode的启动逻辑
 
 ## 背景知识
-1. util.SHashObj
+这部分源码用到了两个基础工具类，请阅读前阅读以下两篇文章:
+[**TDengine SHashObj**](https://github.com/lj-211/article/blob/master/iot/Part.04.A.TDengine-util_hashtable.md)
+[**TDengine SRefSet**](https://github.com/lj-211/article/blob/master/iot/Part.04.A.TDengine-util_tref.md)
 
 ## mnode主要数据结构
 <p align="center">
