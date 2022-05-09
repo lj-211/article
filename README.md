@@ -26,6 +26,16 @@ Go的基础数据结构以及语言本身的设计等等都会在这一系列里
 > - [Part.03.D.Misc-three_advance_cmd_in_git(**GIT三个高级命令**)](./misc/Part.03.D.Misc-three_advance_cmd_in_git.md)
 > - [Part.03.E.Misc-how_to_read_synopsis_of_man(**如何阅读man文档的SYNOPSIS**)](./misc/Part.03.E.Misc-how_to_read_synopsis_of_man.md)
 
+### IoT
+#### TDengine
+> - [Part.04.A.TDengine-util_tref(**TDengine的工具数据结构之tref**)](./iot/Part.04.A.TDengine-util_tref.md)
+> - [Part.04.A.TDengine-util_hashtable(**TDengine的工具数据结构之hashtable**)](./iot/Part.04.A.TDengine-util_hashtable.md)
+> - [Part.04.A.TDengine-WAL_In_TDengine(**TDengine的WAL**)](./iot/Part.04.A.TDengine-WAL_In_TDengine.md)
+> - [Part.04.A.TDengine-why_TDengine_start_slow_when_too_many_ddl_accumulated(**当DDL积累过多时，为什么TDengine会启动变慢**)](./iot/Part.04.A.TDengine-why_TDengine_start_slow_when_too_many_ddl_accumulated.md)
+
+#### EMQX
+> - TODO
+
 ### 思维
 
 ## 备注
