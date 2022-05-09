@@ -2,7 +2,7 @@
 
 ## WAL文件格式
 <p align="center">
-  <img width="821" height = "500" src="https://github.com/lj-211/article/blob/master/res/asc-img/%5BPart.04.A.TDengine-WAL_In_TDengine%5D%20P1%20-%20File%20format.png?raw=true" alt="WAL">
+  <img width="1020" height = "500" src="https://github.com/lj-211/article/blob/master/res/asc-img/%5BPart.04.A.TDengine-WAL_In_TDengine%5D%20P1%20-%20File%20format.png?raw=true" alt="WAL">
 </p>
 <p align="center">P1 - WAL文件格式</p>
 
