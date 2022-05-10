@@ -29,6 +29,7 @@ typedef struct SSdbRow {
 ```
 
 ```c
+// mnode sdb插入行数据
 int32_t sdbInsertRow(SSdbRow *pRow) {
   SSdbTable *pTable = pRow->pTable;
   if (pTable == NULL) return TSDB_CODE_MND_SDB_INVALID_TABLE_TYPE;
@@ -66,6 +67,7 @@ int32_t sdbInsertRow(SSdbRow *pRow) {
   }
 }
 
+// 向写队列中插入SSdbRow
 static int32_t sdbWriteRowToQueue(SSdbRow *pInputRow, int32_t action) {
   SSdbTable *pTable = pInputRow->pTable;
   if (pTable == NULL) return TSDB_CODE_MND_SDB_INVALID_TABLE_TYPE;
@@ -93,6 +95,7 @@ static int32_t sdbWriteRowToQueue(SSdbRow *pInputRow, int32_t action) {
 ```
 
 ```c
+// 工作线程会定期写文件，按照策略flush到磁盘
 static void *sdbWorkerFp(void *pWorker) {
   SSdbRow *pRow;
   int32_t  qtype;
