@@ -129,11 +129,33 @@ static void *sdbWorkerFp(void *pWorker) {
 
 ```
 
+### mnode存储模型
+
+1. mnode的所有表的数据存储
+    - 每个表的最新的row数据存在SSdbTable.iHandle这个hash表中
+    - 每个表的create/update/insert等操作都通过append方式追加到了wal
+
 ## mnode的启动流程
 <p align="center">
   <img width="900" height = "800" src="../res/asc-img/%5BPart.04.A.TDengine-why_TDengine_start_slow_when_too_many_ddl_accumulated%5D%20P2%20-%20Start%20of%20mnode.png" alt="flow">
 </p>
 <p align="center">P2 - flow of mnode start</p>
 
+在mnode的启动流程中最重要的两个步骤：
+1. sdbInitWal
+2. sdbRestoreTables
+
+步骤1，初始化wal，并且读取wal所有的log，将数据恢复到内存中
+
+步骤2，恢复表的数据（比如行数技术等）
+
 ## 结论分析
 
+当有大量的DDL以及acc等表的DML操作时，会导致wal存储了大量的log，这些log需要在启动的时候被全部加载到内存。
+
+这个过程的时间消耗，在wal比较大时，对于线上系统几乎是不能接受的。
+
+当然官方提供了compact命令，但是治标不治本，不能从根本上解决问题。
+
+不过按照TDengine的官方说法，应该会在7月份的3.0版本进行优化：
+> 此外，在未来的 TDengine 3.0 版本中，这也会是我们的重大的优化项。由于 WAL 也会变成分布式的存储，届时，即使是在亿级别表数量的情况下，TDengine 的启停速度也都不再会是问题。而且这项优化不过是 3.0 版本诸多特性的冰山一角。这项调整的背后代表着 TDengine 对于很多重要模块的优化重构，稳定性和性能都会大幅提高，多项重磅功能也会上线。
