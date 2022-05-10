@@ -20,7 +20,7 @@ UTC时间常见的表达方式: “09:30 UTC”就写作“09:30Z”或是“093
 在不需要精确到秒的情况下，通常将GMT 和UTC 视作等同。但UTC 更加科学更加精确，它是以原子时为基础，在时刻上尽量接近世界时的一种时间计量系统。它的出现是现代社会对于精确计时的需要。
 
 ## 图解
-![avatar](https://raw.githubusercontent.com/lj-211/article/master/res/asc-img/Part.03.B.TimeZone-word_timezone.png)
+![avatar](../res/asc-img/Part.03.B.TimeZone-word_timezone.png)
 ## 冬令时和夏令时
 ### 概念
 冬令时和夏令时是当地的标准时间。有冬令时就会有夏令时。大概在每年的3月的某一周，会把时钟拨快1个小时，进入夏令时，在10月的某一
