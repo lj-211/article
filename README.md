@@ -11,6 +11,7 @@ Go的基础数据结构以及语言本身的设计等等都会在这一系列里
 > - [Part.01.D.Golang-slice（**golang的Slice实现**）](./golang/Part.01.D.Golang-slice.md)
 > - [Part.01.E.Golang-channel（**golang的Channel实现**）](./golang/Part.01.E.Golang-channel.md)
 > - [Part.01.F.Golang-how_to_close_channel_correctly（**如何正确的关闭channel**）](./golang/Part.01.F.Golang-how_to_close_channel_correctly.md)
+> - [Part.01.G.Golang-select（**golang的Select实现**）](./golang/Part.01.G.Golang-select.md)
 
 ### Go工程化
 这一系列主要说说在Go在工程化的一些想法。
